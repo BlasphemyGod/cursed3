@@ -15,7 +15,7 @@ class OrderService:
     def cancel_order(self, order: Order) -> bool:
         order.status = 'Отменён'
 
-    def create_order(  # TODO ПРОДУКТЫ ЕЩЁ
+    def create_order(
             self,
             client: User,
             table: Table | None,
