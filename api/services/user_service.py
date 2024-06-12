@@ -28,7 +28,7 @@ class UserService:
             return None
 
     def check_credentials(self, login: str, password: str) -> bool:
-        if _ := authenticate(login=login, password=password):
+        if _ := authenticate(username=login, password=password):
             return True
         return False
 
@@ -41,14 +41,14 @@ class UserService:
             phone_number: str,
             role: Role = None
     ) -> bool:
-        if existing_user := User.objects.complex_filter(Q(login=login) | Q(phone_number=phone_number)):
+        if existing_user := User.objects.complex_filter(Q(username=login) | Q(phone_number=phone_number)):
             return False
 
         if role is None:
             role = Role.objects.get(name__startswith='Клиент')
 
-        new_user = User(
-            login=login,
+        new_user = User.objects.create_user(
+            username=login,
             password=password,
             first_name=first_name,
             last_name=last_name,
@@ -56,13 +56,18 @@ class UserService:
             role=role
         )
 
+        new_user.save()
+
         return True
 
     def get_user_by_login(self, login: str) -> User | None:
         try:
-            return User.objects.get(login=login)
+            return User.objects.get(username=login)
         except User.DoesNotExist:
             return None
+
+    def check_phone_number(self, phone_number: str) -> bool:
+        return not User.objects.filter(phone_number=phone_number).exists()
 
     def change_user_password(self, user: User, password: str):
         user.set_password(password)

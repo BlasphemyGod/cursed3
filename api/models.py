@@ -19,7 +19,7 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=12)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
 
-    shifts = models.ManyToManyField(to=Shift)
+    shifts = models.ManyToManyField(to=Shift, blank=True)
 
 
 class Table(models.Model):
