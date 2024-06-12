@@ -19,12 +19,12 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=12)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
 
-    shifts = models.ManyToManyField(to=Shift, blank=True)
+    shifts = models.ManyToManyField(to=Shift)
 
 
 class Table(models.Model):
-    client = models.ForeignKey(User, related_name='tables', on_delete=models.SET_NULL, null=True)
-    waiter = models.ForeignKey(User, related_name='assigns', on_delete=models.SET_NULL, null=True)
+    client = models.ForeignKey(User, related_name='tables', on_delete=models.SET_NULL, null=True, blank=True)
+    waiter = models.ForeignKey(User, related_name='assigns', on_delete=models.SET_NULL, null=True, blank=True)
 
 
 class Ingredient(models.Model):

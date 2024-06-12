@@ -1,3 +1,6 @@
+import dataclasses
+import json
+from datetime import datetime, date
 from functools import wraps
 
 from api.models import User
@@ -13,7 +16,35 @@ from api.services.promo_service import PromoService
 from api.services.user_service import UserService
 from cursed import settings
 
-__all__ = ['jwt_secured', 'post', 'get', 'provide_services']
+__all__ = ['jwt_secured', 'post', 'get', 'provide_services', 'for_roles', 'jsonify', 'timify']
+
+
+class EnhancedJSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if dataclasses.is_dataclass(o):
+            return dataclasses.asdict(o)
+        if isinstance(o, date):
+            return f'{o.day}.{o.month}.{o.year}'
+        if isinstance(o, datetime):
+            return f'{o.day}.{o.month}.{o.year} {o.hour}:{o.minute}'
+        return super().default(o)
+
+
+def timify(time):
+    if not time:
+        time = datetime.datetime.now()
+    else:
+        date = time.split()[0]
+        day, month, year = date.split('-')
+
+        time = time.split()[1]
+        hour, minute = time.split(':')
+
+        time = datetime(int(year), int(month), int(day), int(hour), int(minute))
+
+
+def jsonify(obj):
+    return json.dumps(obj, cls=EnhancedJSONEncoder)
 
 
 def jwt_secured(endpoint):
@@ -52,10 +83,24 @@ def provide_services(endpoint):
             promo_service=PromoService(),
             product_service=ProductService(),
             order_service=OrderService(),
-            empoloyee_service=EmployeeService()
+            employee_service=EmployeeService()
         )
 
     return provide
+
+
+def for_roles(*roles: str):
+    def for_roles_decorator(endpoint):
+        @wraps(endpoint)
+        def validator(request, *args, **kwargs):
+            if kwargs.get('user').role.name not in roles:
+                raise PermissionDenied('У вас нет таких прав')
+
+            return endpoint(request, *args, **kwargs)
+
+        return validator
+
+    return for_roles_decorator
 
 
 def post(endpoint):

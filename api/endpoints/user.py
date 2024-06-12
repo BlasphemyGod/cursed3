@@ -4,7 +4,6 @@ from django.core.exceptions import BadRequest
 from django.http import HttpResponse
 
 from api.dto import UserDTO
-from api.models import Role
 from api.services.user_service import UserService
 from api.utils import *
 
@@ -27,7 +26,7 @@ def login(request, user_service: UserService = None, **kwargs):
 
     token = user_service.generate_jwt(user)
 
-    return HttpResponse(json.dumps(token), content_type='application/json')
+    return HttpResponse(jsonify(token), content_type='application/json')
 
 
 @provide_services
@@ -68,5 +67,6 @@ def register(request, user_service: UserService = None, **kwargs):
 @jwt_secured
 @get
 def profile(request, user=None, **kwargs):
-    return HttpResponse(UserDTO.from_model(user), content_type='application/json')
+    return HttpResponse(jsonify(UserDTO.from_model(user)), content_type='application/json')
+
 
