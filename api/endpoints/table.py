@@ -18,4 +18,4 @@ def get_available_tables_by_date(request, order_service: OrderService = None, **
 
     time = timify(time)
 
-    return HttpResponse(jsonify(order_service.get_available_tables(time)), content_type='application/json')
+    return HttpResponse(jsonify([t.id for t in order_service.get_available_tables(time)]), content_type='application/json')

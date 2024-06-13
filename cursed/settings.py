@@ -14,9 +14,8 @@ import environ
 from pathlib import Path
 
 env = environ.Env(
-    DEBUG=(bool, True),
     SECRET_KEY=(str, 'django-insecure-bk312jn+_p-9*thb#(i_0c$_-h3f-0gro9g)7_e!7%&eo80)mu'),
-    ALLOWED_HOSTS=(list, [])
+    ALLOWED_HOSTS=(list, ['*', '0.0.0.0', '158.160.115.91'])
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -31,9 +30,9 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = True
 
-ALLOWED_HOSTS = env('ALLOWED_HOSTS')
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -70,6 +69,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media'
             ],
         },
     },
@@ -132,7 +132,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
 
 AUTH_USER_MODEL = 'api.User'
 

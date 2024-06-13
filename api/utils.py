@@ -32,15 +32,17 @@ class EnhancedJSONEncoder(json.JSONEncoder):
 
 def timify(time):
     if not time:
-        time = datetime.datetime.now()
+        real_time = datetime.now()
     else:
         date = time.split()[0]
-        day, month, year = date.split('-')
+        day, month, year = date.split('.')
 
         time = time.split()[1]
         hour, minute = time.split(':')
 
-        time = datetime(int(year), int(month), int(day), int(hour), int(minute))
+        real_time = datetime(int(year), int(month), int(day), int(hour), int(minute))
+
+    return real_time
 
 
 def jsonify(obj):
