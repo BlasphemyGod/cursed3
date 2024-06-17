@@ -7,9 +7,12 @@ class ProductService:
     def get_available_ingredients(self) -> list[Ingredient]:
         return list(Ingredient.objects.filter(count__gt=0).all())
 
-    def replenish_ingredients(self, ids: list[int], counts: list[int]) -> None:
-        for (ingredient_id, count) in zip(ids, counts):
-            ingredient = Ingredient.objects.get(id=ingredient_id)
+    def replenish_ingredients(self, names: list[str], counts: list[int]) -> None:
+        for (name, count) in zip(names, counts):
+            if Ingredient.objects.filter(name=name).first is None:
+                ingredient = Ingredient.objects.create(name=name, count=0)
+            else:
+                ingredient = Ingredient.objects.get(name=name)
             ingredient.count += count
             ingredient.save()
 

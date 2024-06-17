@@ -120,3 +120,76 @@ def create_order(request, user: User = None, order_service: OrderService = None,
     order_service.create_order(user, table, address_data, list(zip(products_list, counts_list)))
 
     return HttpResponse()
+
+
+@get
+@jwt_secured
+@for_roles('Админ')
+@provide_services
+def get_delivery_orders(request, order_service: OrderService = None, **kwargs):
+    return HttpResponse(
+        jsonify(
+            [
+                OrderDTO.from_model(o)
+                for o in order_service.get_delivery_orders()
+            ]
+        )
+    )
+
+
+@get
+@jwt_secured
+@for_roles('Админ')
+@provide_services
+def get_unfinished_delivery_orders(request, order_service: OrderService = None, **kwargs):
+    return HttpResponse(
+        jsonify(
+            [
+                OrderDTO.from_model(o)
+                for o in order_service.get_unfinished_delivery_orders()
+            ]
+        )
+    )
+
+
+@post
+@jwt_secured
+@for_roles('Админ')
+@provide_services
+def appoint_courier_to_order(request, employee_service: EmployeeService = None, **kwargs):
+    data = json.loads(request.body)
+
+    courier_id_data = data.get('courier_id', None)
+    order_id_data = data.get('order_id', None)
+
+    if not courier_id_data or not order_id_data:
+        raise BadRequest('Хотя бы одно поле должно быть заполнено')
+
+    employee = User.objects.get(id=courier_id_data)
+    order = Order.objects.get(id=order_id_data)
+
+    employee_service.appoint_courier_to_order(employee, order)
+
+    return HttpResponse()
+
+
+@get
+@jwt_secured
+@for_roles('Работник кухни')
+@provide_services
+def get_active_orders(request, order_service: OrderService = None, **kwargs):
+    return HttpResponse(
+        jsonify(
+            [
+                OrderDTO.from_model(o)
+                for o in order_service.get_orders(
+                    'Принят',
+                    []
+                ) +
+                order_service.get_orders(
+                    'Готовится',
+                    []
+                )
+            ]
+        )
+    )

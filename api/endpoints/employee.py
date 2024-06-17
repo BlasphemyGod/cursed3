@@ -92,3 +92,67 @@ def get_employee_shifts(request, user: User, employee_service: EmployeeService =
 @for_roles('Админ')
 def get_employees_roles(request, employee_service: EmployeeService = None, **kwargs):
     return HttpResponse(jsonify([RoleDTO.from_model(r) for r in employee_service.get_employees_roles()]), content_type='application/json')
+
+
+@post
+@jwt_secured
+@provide_services
+@for_roles('Админ')
+def appoint_employee_to_shift(request, employee_service: EmployeeService = None, **kwargs):
+    data = json.loads(request.body)
+
+    employee_id = data.get('employee_id', None)
+    date = data.get('date', None)
+
+    employee = User.objects.get(id=employee_id)
+    date = timify(date)
+
+    employee_service.appoint_employee_to_shift(employee, date)
+
+    return HttpResponse()
+
+
+@post
+@jwt_secured
+@provide_services
+@for_roles('Админ')
+def remove_employee_from_shift(request, employee_service: EmployeeService = None, **kwargs):
+    data = json.loads(request.body)
+
+    employee_id = data.get('employee_id', None)
+    date = data.get('date', None)
+
+    employee = User.objects.get(id=employee_id)
+    date = timify(date)
+
+    employee_service.remove_employee_from_shift(employee, date)
+
+    return HttpResponse()
+
+
+@post
+@jwt_secured
+@provide_services
+@for_roles('Админ')
+def fire_employee(request, employee_id: int, **kwargs):
+    User.objects.get(id=employee_id).delete()
+
+    return HttpResponse()
+
+
+@post
+@jwt_secured
+@provide_services
+@for_roles('Работник зала')
+def appoint_waiter_to_table(request, employee_service: EmployeeService = None, **kwargs):
+    data = json.loads(request.body)
+
+    employee_id = data.get('waiter_id', None)
+    table_id = data.get('table_id', None)
+
+    employee = User.objects.get(id=employee_id)
+    table = Table.objects.get(id=table_id)
+
+    employee_service.appoint_waiter_to_table(employee, table)
+
+    return HttpResponse()

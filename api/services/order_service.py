@@ -126,6 +126,12 @@ class OrderService:
     def get_order(self, order_id: int) -> Order:
         return Order.objects.get(id=order_id)
 
+    def get_delivery_orders(self) -> list[Order]:
+        return list(Order.objects.filter(status='Передан на доставку').exclude(courier=None).all())
+
+    def get_unfinished_delivery_orders(self) -> list[Order]:
+        return list(Order.objects.filter(courier=None).all())
+
     def analyze_sales(self, from_date: date, to_date: date) -> dict[Product, int]:
         orders = Order.objects.filter(date__gte=from_date).filter(date__lte=to_date)
 

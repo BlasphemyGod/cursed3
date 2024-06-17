@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
 
-from api.models import User, Promo, Order, OrderProduct, Product, Role
+from api.models import User, Promo, Order, OrderProduct, Product, Role, Ingredient, Table, ProductIngredient
 
 
 @dataclass
@@ -55,6 +55,17 @@ class BookingDTO:
 
 
 @dataclass
+class IngredientDTO:
+    id: int
+    name: str
+    count: int
+
+    @staticmethod
+    def from_model(ingredient: Ingredient) -> 'IngredientDTO':
+        return IngredientDTO(ingredient.id, ingredient.name, ingredient.count)
+
+
+@dataclass
 class ProductDTO:
     id: int
     name: str
@@ -63,6 +74,30 @@ class ProductDTO:
     @staticmethod
     def from_model(product: Product) -> 'ProductDTO':
         return ProductDTO(product.id, product.name, product.price)
+
+
+@dataclass
+class ProductWithIngredientsDTO:
+    id: int
+    name: str
+    price: Decimal
+    ingredients: list[IngredientDTO]
+
+    @staticmethod
+    def from_model(product: Product) -> 'ProductWithIngredientsDTO':
+        return ProductWithIngredientsDTO(
+            product.id,
+            product.name,
+            product.price,
+            [
+                IngredientDTO(
+                    ingredient.ingredient_id,
+                    ingredient.ingredient.name,
+                    ingredient.count
+                )
+                for ingredient in ProductIngredient.objects.filter(product_id=product.id).all()
+            ]
+        )
 
 
 @dataclass
@@ -98,4 +133,19 @@ class OrderDTO:
                     order_product.count
                 ) for order_product in OrderProduct.objects.filter(order_id=order.id).all()
             ]
+        )
+
+
+@dataclass
+class TableDTO:
+    id: int
+    waiter_id: int | None
+    client_id: int | None
+
+    @staticmethod
+    def from_model(table: Table) -> 'TableDTO':
+        return TableDTO(
+            table.id,
+            table.client_id if table.client else None,
+            table.waiter_id if table.waiter else None
         )

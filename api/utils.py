@@ -42,8 +42,11 @@ def timify(time):
         date = time.split()[0]
         day, month, year = date.split('.')
 
-        time = time.split()[1]
-        hour, minute = time.split(':')
+        hour = minute = 0
+
+        if len(time.split()) == 2:
+            time = time.split()[1]
+            hour, minute = time.split(':')
 
         real_time = datetime(int(year), int(month), int(day), int(hour), int(minute))
 

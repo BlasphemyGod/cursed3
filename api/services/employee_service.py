@@ -20,6 +20,12 @@ class EmployeeService:
             shift.user_set.add(employee)
             shift.save()
 
+    def remove_employee_from_shift(self, employee: User, shift_date: date):
+        shift: Shift = employee.shifts.filter(date=shift_date).first()
+
+        if shift is not None:
+            employee.shifts.remove(shift)
+
     def appoint_courier_to_order(self, courier: User, order: Order):
         if courier.role.name != 'Курьер':
             raise ValueError('На доставку можно назначить только курьера')
