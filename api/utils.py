@@ -113,8 +113,23 @@ def for_roles(*roles: str):
 def post(endpoint):
     @wraps(endpoint)
     def is_post(request, *args, **kwargs):
+        if request.method == 'OPTIONS':
+            return HttpResponse(
+                status=204,
+                headers={
+                    "Access-Control-Allow-Origin": request.headers['origin'],
+                    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+                    "Access-Control-Allow-Headers": "Authorization, Content-Type",
+                    "Access-Control-Max-Age": 86400 ,
+                    "Vary": "Accept-Encoding, Origin"
+                }
+            )
         if request.method == 'POST':
-            return endpoint(request, *args, **kwargs)
+            response = endpoint(request, *args, **kwargs)
+            if 'origin' in request.headers:
+                response.headers["Access-Control-Allow-Origin"] = request.headers['origin']
+
+            return response
 
         return HttpResponse(status=405)
 
@@ -124,8 +139,24 @@ def post(endpoint):
 def get(endpoint):
     @wraps(endpoint)
     def is_get(request, *args, **kwargs):
+        if request.method == 'OPTIONS':
+            return HttpResponse(
+                status=204,
+                headers={
+                    "Access-Control-Allow-Origin": request.headers['origin'],
+                    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+                    "Access-Control-Allow-Headers": "Authorization, Content-Type",
+                    "Access-Control-Max-Age": 86400,
+                    "Vary": "Accept-Encoding, Origin"
+                }
+            )
+
         if request.method == 'GET':
-            return endpoint(request, *args, **kwargs)
+            response = endpoint(request, *args, **kwargs)
+            if 'origin' in request.headers:
+                response.headers["Access-Control-Allow-Origin"] = request.headers['origin']
+
+            return response
 
         return HttpResponse(status=405)
 

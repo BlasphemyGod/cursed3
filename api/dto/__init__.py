@@ -2,7 +2,17 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
 
-from api.models import User, Promo, Order, OrderProduct, Product
+from api.models import User, Promo, Order, OrderProduct, Product, Role
+
+
+@dataclass
+class RoleDTO:
+    id: int
+    name: str
+    
+    @staticmethod
+    def from_model(role: Role) -> 'RoleDTO':
+        return RoleDTO(role.id, role.name)
 
 
 @dataclass

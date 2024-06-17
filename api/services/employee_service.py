@@ -1,6 +1,6 @@
 from datetime import date
 
-from api.models import User, Order, Shift, Table
+from api.models import User, Order, Shift, Table, Role
 
 
 class EmployeeService:
@@ -49,3 +49,6 @@ class EmployeeService:
 
     def get_waiter_appointments(self) -> dict[int, User]:
         return {table.id: table.waiter for table in Table.objects.all()}
+
+    def get_employees_roles(self) -> list[Role]:
+        return list(Role.objects.exclude(name='Клиент').all())

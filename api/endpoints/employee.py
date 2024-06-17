@@ -3,7 +3,7 @@ import json
 from django.core.exceptions import BadRequest
 from django.http import HttpResponse
 
-from api.dto import EmployeeDTO, UserDTO
+from api.dto import EmployeeDTO, UserDTO, RoleDTO
 from api.models import Role, Table, User
 from api.services.employee_service import EmployeeService
 from api.services.user_service import UserService
@@ -84,3 +84,11 @@ def get_employee_shifts(request, user: User, employee_service: EmployeeService =
         ),
         content_type='application/json'
     )
+
+
+@get
+@jwt_secured
+@provide_services
+@for_roles('Админ')
+def get_employees_roles(request, employee_service: EmployeeService = None, **kwargs):
+    return HttpResponse(jsonify([RoleDTO.from_model(r) for r in employee_service.get_employees_roles()]), content_type='application/json')

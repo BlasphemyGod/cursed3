@@ -44,6 +44,8 @@ class OrderService:
                 if consumption.ingredient.count < ingredients_consumption:
                     raise ValueError(f'Недостаточно продуктов на складе для: {product.name}')
 
+                consumption.ingredient.count -= ingredients_consumption
+
                 consumption.ingredient.save()
             
             OrderProduct.objects.create(order=order, product=product, count=count)

@@ -24,5 +24,6 @@ urls = [
 
     path('employees', get_employees, name='get_employees'),
     path('employees/new', new_employee, name='new_employee'),
-    path('employee/shift', get_employee_shifts, name='get_employee_shifts')
+    path('employee/shift', get_employee_shifts, name='get_employee_shifts'),
+    path('employee/roles', get_employees_roles, name='get_employees_roles')
 ]
