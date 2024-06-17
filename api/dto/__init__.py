@@ -67,8 +67,8 @@ class OrderProductDTO:
 class OrderDTO:
     id: int
     date: datetime
-    address: str
-    table: int
+    address: str | None
+    table: int | None
     status: str
     products: list[OrderProductDTO]
 
@@ -78,14 +78,14 @@ class OrderDTO:
             order.id,
             order.date,
             order.address,
-            order.table.id,
+            order.table.id if order.table else None,
             order.status,
             [
                 OrderProductDTO(
                     order_product.product.id,
                     order_product.product.name,
                     order_product.product.price,
-                    order_product.product.count
+                    order_product.count
                 ) for order_product in OrderProduct.objects.filter(order_id=order.id).all()
             ]
         )

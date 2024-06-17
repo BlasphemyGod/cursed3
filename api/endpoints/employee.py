@@ -75,10 +75,12 @@ def get_employees(request, employee_service: EmployeeService = None, **kwargs):
 @for_roles('Курьер', 'Официант', 'Админ', 'Работник зала', 'Работник кухни')
 def get_employee_shifts(request, user: User, employee_service: EmployeeService = None, **kwargs):
     return HttpResponse(
-        EmployeeDTO(
-            UserDTO.from_model(user),
-            [shift.date for shift in user.shifts.all()],
-            [table.id for table in Table.objects.filter(waiter_id=user.id)]
+        jsonify(
+            EmployeeDTO(
+                UserDTO.from_model(user),
+                [shift.date for shift in user.shifts.all()],
+                [table.id for table in Table.objects.filter(waiter_id=user.id)]
+            )
         ),
         content_type='application/json'
     )

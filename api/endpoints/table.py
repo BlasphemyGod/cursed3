@@ -13,6 +13,7 @@ from api.utils import *
 @get
 @jwt_secured
 @for_roles('Клиент', 'Официант', 'Работник зала', 'Админ')
+@provide_services
 def get_available_tables_by_date(request, order_service: OrderService = None, **kwargs):
     time = request.GET.get('time', None)
 

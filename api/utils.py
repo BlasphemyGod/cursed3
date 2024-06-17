@@ -1,7 +1,8 @@
 import dataclasses
 import json
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from functools import wraps
+from decimal import Decimal
 
 from api.models import User
 from django.core.exceptions import PermissionDenied
@@ -23,10 +24,14 @@ class EnhancedJSONEncoder(json.JSONEncoder):
     def default(self, o):
         if dataclasses.is_dataclass(o):
             return dataclasses.asdict(o)
-        if isinstance(o, date):
-            return f'{o.day}.{o.month}.{o.year}'
         if isinstance(o, datetime):
-            return f'{o.day}.{o.month}.{o.year} {o.hour}:{o.minute}'
+            o = o + timedelta(hours=4)
+            return f'{o.day:02d}.{o.month:02d}.{o.year} {o.hour:02d}:{o.minute:02d}'
+        if isinstance(o, date):
+            return f'{o.day:02d}.{o.month:02d}.{o.year}'
+        if isinstance(o, Decimal):
+            return float(o)
+
         return super().default(o)
 
 

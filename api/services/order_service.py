@@ -14,6 +14,7 @@ class OrderService:
 
     def cancel_order(self, order: Order) -> bool:
         order.status = 'Отменён'
+        order.save()
 
     def create_order(
             self,
@@ -25,16 +26,16 @@ class OrderService:
         if not (table or address):
             raise ValueError('Необходимо указать хотя бы один из аргументов: стол или адрес')
 
-        if table.client:
-            raise ValueError('Этот столик уже занят')
+        
+        if table is not None:
+            if not table.waiter:
+                raise ValueError('Этот столик не обслуживает ни один официант')
 
-        if table.waiter:
-            raise ValueError('Этот столик не обслуживает ни один официант')
-
-        table.client = client
-        table.save()
+            table.client = client
+            table.save()
 
         order = Order(status='Принят', date=datetime.now(), client=client, table=table, address=address)
+        order.save()
 
         for product, count in products:
             for consumption in ProductIngredient.objects.filter(product=product):
@@ -44,8 +45,8 @@ class OrderService:
                     raise ValueError(f'Недостаточно продуктов на складе для: {product.name}')
 
                 consumption.ingredient.save()
-
-        order.save()
+            
+            OrderProduct.objects.create(order=order, product=product, count=count)
 
         return order
 
@@ -58,14 +59,14 @@ class OrderService:
         if with_tables:
             orders = orders.filter(table__id__in=with_tables)
 
-        return list(filter(lambda o: o.products.exists(), orders))
+        return list(filter(lambda o: o.products.exists(), orders.order_by('-date').all()))
 
     def book_table(self, client: User, time: datetime, table: Table):
         if any(
             list(
                 map(
                     lambda o: not o.products.exists(),
-                    Order.objects.filter(date=time, table=table).exclude(status='Отменён')
+                    Order.objects.filter(date__day=time.day, date__month=time.month, date__year=time.year, table=table).exclude(status='Отменён')
                 )
             ) + list(
                 map(
@@ -91,7 +92,7 @@ class OrderService:
     def get_available_tables(self, time: date) -> list[Table]:
         result = []
 
-        current_date = datetime.today()
+        current_date = date.today()
 
         tables = Table.objects.all()
 
@@ -103,7 +104,7 @@ class OrderService:
                 lambda order: order.table.id,
                 filter(
                     lambda o: not o.products.exists(),
-                    Order.objects.filter(date=time)
+                    Order.objects.filter(date__day=time.day, date__month=time.month, date__year=time.year)
                 )
             )
         )

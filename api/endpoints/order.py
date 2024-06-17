@@ -4,7 +4,7 @@ from django.core.exceptions import BadRequest
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 
-from api.dto import EmployeeDTO, UserDTO, BookingDTO
+from api.dto import EmployeeDTO, UserDTO, BookingDTO, OrderDTO
 from api.models import Role, Table, User, Order, Product
 from api.services.employee_service import EmployeeService
 from api.services.order_service import OrderService
@@ -58,18 +58,24 @@ def cancel_booking(request, user: User = None, order_service: OrderService = Non
 
     order_service.cancel_order(booking)
 
+    return HttpResponse()
+
 
 @get
 @jwt_secured
-@for_roles('Клиент')
+@for_roles('Клиент', 'Официант', 'Курьер')
 @provide_services
 def get_user_orders(request, user: User = None, order_service: OrderService = None, **kwargs):
+    officiant_tables = [t.id for t in Table.objects.filter(waiter_id=user.id).all()]
     return HttpResponse(
         jsonify(
             list(
-                filter(
-                    lambda o: o.client.id == user.id,
-                    order_service.get_orders(None, [])
+                map(
+                    lambda order: OrderDTO.from_model(order),
+                    filter(
+                        lambda o: o.client.id == user.id or o.table_id in officiant_tables or o.courier_id == user.id,
+                        order_service.get_orders(None, [] if user.role.name not in ('Официант',) else officiant_tables)
+                    )
                 )
             )
         ),
@@ -84,7 +90,7 @@ def get_user_orders(request, user: User = None, order_service: OrderService = No
 def change_order_status(request, order_id: int, order_service: OrderService = None, **kwargs):
     order = get_object_or_404(Order, id=order_id)
 
-    order_service.change_order_status(order, request.body)
+    order_service.change_order_status(order, request.body.decode('utf8'))
 
     return HttpResponse()
 
