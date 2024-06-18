@@ -3,7 +3,7 @@ from typing import Any
 
 from django.db.models import Count, Sum
 from reportlab.lib.pagesizes import letter
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 
@@ -56,15 +56,16 @@ class ReportService:
             order__date__date__lte=to_date
         ).values('product__name', 'product__price').annotate(
             total_quantity=Sum('count'),
-            total_price=Sum('product__price', field="product__price * api_orderproduct.count")
+            total_price='product__price * count'
         ).order_by('-total_quantity')
 
         most_popular_product = sold_products.first()
 
         doc = SimpleDocTemplate(buffer, pagesize=letter)
         styles = getSampleStyleSheet()
+        styles['Normal'] = ParagraphStyle('Normal', parent=styles['Normal'], fontName='Verdana')
         story = [
-            Paragraph(f"Отчет о продажах с {from_date} по {to_date}", styles['Heading1']),
+            Paragraph(f"Отчет о продажах с {from_date.day}.{from_date.month}.{from_date.year} по {to_date.day}.{to_date.month}.{to_date.year}", styles['Heading1']),
             Spacer(1, 0.25 * inch)
         ]
 
