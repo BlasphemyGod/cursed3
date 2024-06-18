@@ -50,4 +50,6 @@ urls = [
     path('shifts', get_employees_by_shift, name='get_employees_by_shift'),
     path('shift/appoint', appoint_employee_to_shift, name='appoint_employee_to_shift'),
     path('shift/remove', remove_employee_from_shift, name='remove_employee_from_shift'),
+
+    path('report/employee', get_user_report, name='get_user_report')
 ]
