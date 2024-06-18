@@ -156,3 +156,23 @@ def appoint_waiter_to_table(request, employee_service: EmployeeService = None, *
     employee_service.appoint_waiter_to_table(employee, table)
 
     return HttpResponse()
+
+
+@get
+@jwt_secured
+@provide_services
+@for_roles('Админ')
+def get_employees_by_shift(request, employee_service: EmployeeService = None, **kwargs):
+    date = request.GET.get('date')
+
+    if not date:
+        raise BadRequest('Необходимо указать дату смены')
+
+    return HttpResponse(
+        jsonify(
+            [
+                UserDTO.from_model(u)
+                for u in employee_service.get_shifts()[date]
+            ]
+        )
+    )

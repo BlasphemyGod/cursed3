@@ -49,7 +49,7 @@ class EmployeeService:
     def get_shifts(self) -> dict[str, list[User]]:
         result = {}
         for shift in Shift.objects.all():
-            result[shift.date] = list(shift.user_set.all())
+            result[f'{shift.date.day:02d}.{shift.date.month:02d}.{shift.date.year}'] = list(shift.user_set.all())
 
         return result
 

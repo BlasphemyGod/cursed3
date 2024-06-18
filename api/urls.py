@@ -45,8 +45,9 @@ urls = [
     path('employees/new', new_employee, name='new_employee'),
     path('employee/shift', get_employee_shifts, name='get_employee_shifts'),
     path('employee/roles', get_employees_roles, name='get_employees_roles'),
-    path('employee/<int:employee_id>/fire', get_employees_roles, name='get_employees_roles'),
+    path('employee/<int:employee_id>/fire', get_employees_roles, name='fire_employee'),
 
+    path('shifts', get_employees_by_shift, name='get_employees_by_shift'),
     path('shift/appoint', appoint_employee_to_shift, name='appoint_employee_to_shift'),
     path('shift/remove', remove_employee_from_shift, name='remove_employee_from_shift'),
 ]

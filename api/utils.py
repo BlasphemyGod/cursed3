@@ -14,6 +14,7 @@ from api.services.employee_service import EmployeeService
 from api.services.order_service import OrderService
 from api.services.product_service import ProductService
 from api.services.promo_service import PromoService
+from api.services.report_service import ReportService
 from api.services.user_service import UserService
 from cursed import settings
 
@@ -93,7 +94,8 @@ def provide_services(endpoint):
             promo_service=PromoService(),
             product_service=ProductService(),
             order_service=OrderService(),
-            employee_service=EmployeeService()
+            employee_service=EmployeeService(),
+            report_service=ReportService()
         )
 
     return provide

@@ -9,6 +9,8 @@ class OrderService:
         if order.status == 'Обслужен':
             order.table.client = None
 
+            order.table.save()
+
         order.status = status
         order.save()
 
@@ -26,7 +28,6 @@ class OrderService:
         if not (table or address):
             raise ValueError('Необходимо указать хотя бы один из аргументов: стол или адрес')
 
-        
         if table is not None:
             if not table.waiter:
                 raise ValueError('Этот столик не обслуживает ни один официант')
@@ -34,7 +35,14 @@ class OrderService:
             table.client = client
             table.save()
 
-        order = Order(status='Принят', date=datetime.now(), client=client, table=table, address=address)
+        order = Order(
+            status='Принят',
+            date=datetime.now(),
+            client=client,
+            table=table,
+            address=address,
+            waiter_id=table.waiter_id
+        )
         order.save()
 
         for product, count in products:
@@ -47,8 +55,12 @@ class OrderService:
                 consumption.ingredient.count -= ingredients_consumption
 
                 consumption.ingredient.save()
+
+            order.total += product.price
             
             OrderProduct.objects.create(order=order, product=product, count=count)
+
+        order.save()
 
         return order
 
