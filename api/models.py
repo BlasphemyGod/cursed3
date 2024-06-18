@@ -73,7 +73,7 @@ class Order(models.Model):
     status = models.CharField(max_length=20)
     date = models.DateTimeField()
     address = models.CharField(max_length=100, null=True, default=None, blank=True)
-    total = models.DecimalField(default=Decimal(0))
+    total = models.DecimalField(default=Decimal(0), max_digits=11, decimal_places=2)
 
     client = models.ForeignKey(User, related_name='orders', on_delete=models.SET_NULL, null=True)
     waiter = models.ForeignKey(User, related_name='served_orders', on_delete=models.SET_NULL, null=True, blank=True)
