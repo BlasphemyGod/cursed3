@@ -74,7 +74,7 @@ def get_all_ingredients(request, product_service: ProductService = None, **kwarg
 def replenish_ingredients(request, product_service: ProductService = None, **kwargs):
     data = json.loads(request.body)
 
-    names = [d['name']for d in data]
+    names = [d['name'] for d in data]
     counts = [d['count'] for d in data]
 
     product_service.replenish_ingredients(names, counts)

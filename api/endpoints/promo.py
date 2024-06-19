@@ -14,7 +14,7 @@ from api.utils import *
 
 @get
 @jwt_secured
-@for_roles('Клиент')
+@for_roles('Админ', 'Клиент')
 @provide_services
 def get_promos(request, promo_service: PromoService = None, **kwargs):
     return HttpResponse(
@@ -38,6 +38,9 @@ def add_promo(request, promo_service: PromoService = None, **kwargs):
         content = forms.ImageField()
 
     new_promo = NewPromo(request.POST, request.FILES)
+    
+    if not new_promo.is_valid():
+        raise BadRequest('Нужно заполнить все поля')
 
     text = new_promo.cleaned_data.get('text')
     img = new_promo.cleaned_data.get('content')

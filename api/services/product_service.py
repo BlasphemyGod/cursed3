@@ -9,7 +9,7 @@ class ProductService:
 
     def replenish_ingredients(self, names: list[str], counts: list[int]) -> None:
         for (name, count) in zip(names, counts):
-            if Ingredient.objects.filter(name=name).first is None:
+            if Ingredient.objects.filter(name=name).first() is None:
                 ingredient = Ingredient.objects.create(name=name, count=0)
             else:
                 ingredient = Ingredient.objects.get(name=name)
