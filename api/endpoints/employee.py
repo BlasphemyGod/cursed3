@@ -172,7 +172,7 @@ def get_employees_by_shift(request, employee_service: EmployeeService = None, **
         jsonify(
             [
                 UserDTO.from_model(u)
-                for u in employee_service.get_shifts()[date]
+                for u in employee_service.get_shifts().get(date, [])
             ]
         )
     )

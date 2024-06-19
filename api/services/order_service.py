@@ -41,7 +41,8 @@ class OrderService:
             client=client,
             table=table,
             address=address,
-            waiter_id=table.waiter_id
+            waiter_id=table.waiter_id,
+            total=sum([p.price * count for p, count in products])
         )
         order.save()
 
@@ -55,12 +56,8 @@ class OrderService:
                 consumption.ingredient.count -= ingredients_consumption
 
                 consumption.ingredient.save()
-
-            order.total += product.price
             
             OrderProduct.objects.create(order=order, product=product, count=count)
-
-        order.save()
 
         return order
 
