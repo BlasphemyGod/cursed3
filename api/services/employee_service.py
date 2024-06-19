@@ -11,14 +11,15 @@ class EmployeeService:
         if employee.role.name == 'Клиент':
             raise ValueError('На смену можно назначить только работника')
 
-        if shift := Shift.objects.get(date=shift_date):
+        if shift := Shift.objects.filter(date=shift_date).first():
             if not shift.user_set.filter(id=employee.id).exists():
                 shift.user_set.add(employee)
                 shift.save()
         else:
             shift = Shift(date=shift_date)
-            shift.user_set.add(employee)
             shift.save()
+            employee.shifts.add(shift)
+            employee.save()
 
     def remove_employee_from_shift(self, employee: User, shift_date: date):
         shift: Shift = employee.shifts.filter(date=shift_date).first()
